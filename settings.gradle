@@ -1,0 +1,5 @@
+rootProject.name = 'PizzaMicroservice'
+include 'menu-service'
+include 'order-service'
+include 'kitchen-service'
+
