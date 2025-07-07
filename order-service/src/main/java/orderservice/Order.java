@@ -3,6 +3,7 @@ package orderservice;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -12,9 +13,12 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ElementCollection
-    private List<Long> items;
+    private String customerName;
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+    private Double orderAmount;
 
     private String status;
+    @ElementCollection
+    private List<Long> items;
 }

@@ -21,7 +21,7 @@ public class OrderController {
     public Order createOrder(@RequestBody List<Long> items) {
         // Проверяем существование всех items в меню
         for (Long itemId : items) {
-            String menuServiceUrl = "http://localhost:8081/menu/" + itemId;
+            String menuServiceUrl = "http://localhost:8084/menu/" + itemId;
             restTemplate.getForObject(menuServiceUrl, Object.class);
         }
 
@@ -31,7 +31,7 @@ public class OrderController {
         newOrder.setStatus("CREATED");
         orderRepository.save(newOrder);
 
-        String kitchenServiceUrl = "http://localhost:8083/kitchen/orders";
+        String kitchenServiceUrl = "http://localhost:8085/kitchen/orders";
         restTemplate.postForObject(kitchenServiceUrl, newOrder, Object.class);
 
         return newOrder;
