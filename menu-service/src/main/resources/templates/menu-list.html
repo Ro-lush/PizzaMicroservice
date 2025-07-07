@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Меню пиццерии</title>
+</head>
+<body>
+<h1>Меню</h1>
+
+<a href="/menu/add-form">Добавить новую позицию</a>
+
+<table>
+    <thead>
+    <tr>
+        <th>Название</th>
+        <th>Цена</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${menu}">
+        <td th:text="${item.name}"></td>
+        <td th:text="${item.price}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
