@@ -14,9 +14,16 @@ spring:
     properties:
       hibernate:
         default_schema: order_schema
+    jackson:
+      serialization:
+        write-dates-as-timestamps: false
 menu:
   service:
     url: http://localhost:8084/menu
 kitchen:
   service:
     url: http://localhost:8086/kitchen/orders
+logging:
+  level:
+    org.springframework.web: DEBUG
+    com.pizzeria.order: DEBUG

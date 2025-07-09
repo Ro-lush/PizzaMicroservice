@@ -1,8 +1,10 @@
 package menuservice;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -35,5 +37,21 @@ public class MenuController {
     public String addItem(@ModelAttribute Menu item) {
         menuRepository.save(item);
         return "redirect:/menu";
+    }
+
+
+    // REST Endpoints
+    @GetMapping("/api")
+    @ResponseBody
+    public List<Menu> getAllMenuApi() {
+        return menuRepository.findAll();
+    }
+
+    @GetMapping("/api/{id}")
+    @ResponseBody
+    public Menu getMenuItemApi(@PathVariable Long id) {
+        return menuRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Пункт меню не найден"));
     }
 }

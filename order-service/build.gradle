@@ -1,4 +1,5 @@
 dependencies {
 
-implementation project(path: ':menu-service')
+
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
