@@ -14,16 +14,6 @@ public class MenuController {
     public MenuController(MenuRepository menuRepository) {
         this.menuRepository = menuRepository;
     }
-
-    /*   @GetMapping
-       public List<Menu> getMenu() {
-           return menuRepository.findAll();
-       }
-
-       @GetMapping("/{id}")
-       public Menu getMenuItem(@PathVariable Long id) {
-           return menuRepository.findById(id).orElseThrow();
-       }*/
     @GetMapping
     public String getAllMenu(Model model) {
         model.addAttribute("menu", menuRepository.findAll());

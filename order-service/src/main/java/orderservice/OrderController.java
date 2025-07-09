@@ -1,10 +1,15 @@
 package orderservice;
 
 
+
+import orderservice.dto.MenuItem;
+import orderservice.dto.OrderRequest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/orders")
@@ -12,35 +17,57 @@ public class OrderController {
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
 
+    @Value("${menu.service.url}")
+    private String menuServiceUrl;
+
+    @Value("${kitchen.service.url}")
+    private String kitchenServiceUrl;
+
     public OrderController(OrderRepository orderRepository, RestTemplate restTemplate) {
         this.orderRepository = orderRepository;
         this.restTemplate = restTemplate;
     }
 
     @PostMapping
-    public Order createOrder(@RequestBody List<Long> items) {
-        // Проверяем существование всех items в меню
-        for (Long itemId : items) {
-            String menuServiceUrl = "http://localhost:8084/menu/" + itemId;
-            restTemplate.getForObject(menuServiceUrl, Object.class);
+    public ResponseEntity<Order> createOrder(@RequestBody OrderRequest orderRequest) {
+        // Проверка меню и расчет суммы
+        double totalAmount = 0.0;
+        for (Long itemId : orderRequest.getItems()) {
+            String url = menuServiceUrl + "/" + itemId;
+            MenuItem menuItem = restTemplate.getForObject(url, MenuItem.class);
+            if (menuItem != null) {
+                totalAmount += menuItem.getPrice();
+            }
         }
 
-        // Отправляем заказ на кухню
-        Order newOrder = new Order();
-        newOrder.setItems(items);
-        newOrder.setStatus("CREATED");
-        orderRepository.save(newOrder);
+        Order order = new Order();
+        order.setCustomerName(orderRequest.getCustomerName());
+        order.setCreatedAt(LocalDateTime.now());
+        order.setOrderAmount(totalAmount);
+        order.setStatus("CREATED");
+        order.setItems(orderRequest.getItems());
 
-        String kitchenServiceUrl = "http://localhost:8085/kitchen/orders";
-        restTemplate.postForObject(kitchenServiceUrl, newOrder, Object.class);
+        Order savedOrder = orderRepository.save(order);
 
-        return newOrder;
+        // Отправка заказа на кухню
+        restTemplate.postForObject(kitchenServiceUrl, savedOrder, Void.class);
+
+        return ResponseEntity.status(201).body(savedOrder);
+    }
+
+    @GetMapping("/{id}")
+    public Order getOrder(@PathVariable Long id) {
+        return orderRepository.findById(id).orElse(null);
     }
 
     @PutMapping("/{id}/status")
-    public Order updateStatus(@PathVariable Long id, @RequestBody String status) {
-        Order order = orderRepository.findById(id).orElseThrow();
-        order.setStatus(status);
-        return orderRepository.save(order);
+    public ResponseEntity<String> updateStatus(@PathVariable Long id, @RequestBody String status) {
+        Order order = orderRepository.findById(id).orElse(null);
+        if (order != null) {
+            order.setStatus(status);
+            orderRepository.save(order);
+            return ResponseEntity.ok("Статус обновлён");
+        }
+        return ResponseEntity.notFound().build();
     }
 }

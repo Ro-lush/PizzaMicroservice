@@ -14,3 +14,9 @@ spring:
     properties:
       hibernate:
         default_schema: order_schema
+menu:
+  service:
+    url: http://localhost:8084/menu
+kitchen:
+  service:
+    url: http://localhost:8086/kitchen/orders

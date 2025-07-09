@@ -14,8 +14,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String customerName;
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+
+    private LocalDateTime createdAt;
     private Double orderAmount;
 
     private String status;
